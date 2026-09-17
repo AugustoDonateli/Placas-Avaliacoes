@@ -11,11 +11,14 @@
     "db:migrate:remote": "wrangler d1 migrations apply placas-avaliacoes --remote",
     "db:seed": "wrangler d1 execute placas-avaliacoes --local --file=seeds/dev-seed.sql",
     "db:reset": "rm -rf .wrangler/state/v3/d1 && npm run db:migrate",
-    "db:list": "wrangler d1 execute placas-avaliacoes --local --command \"SELECT code, status, establishment, destination_url FROM plates ORDER BY code;\""
+    "db:list": "wrangler d1 execute placas-avaliacoes --local --command \"SELECT code, status, establishment, destination_url FROM plates ORDER BY code;\"",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260916.1",
     "typescript": "^5.7.2",
+    "vitest": "^5.0.1",
     "wrangler": "^4.133.0"
   }
 }

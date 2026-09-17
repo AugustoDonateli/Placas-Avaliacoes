@@ -78,6 +78,7 @@ avaliação. Quer ajuda para pegar o link direto?"* — sem bloquear.
 | Formato | Por que rejeitar |
 |---|---|
 | `https://business.google.com/...` | Painel administrativo do dono. Exige login dele; para o cliente final não abre nada. Se aparecer, é erro de cópia. |
+| `https://g.co/kgs/...` | Encurtador institucional do Google. É do Google, mas serve muitos produtos além de fichas de empresa — fora até haver necessidade concreta. **Em aberto:** ver "Formatos ambíguos". |
 | `https://www.google.com/url?q=...` | **Open redirect operado pelo próprio Google.** Ver abaixo — é o furo mais importante deste documento. |
 | Qualquer host fora da lista | Inclusive encurtadores de terceiros (bit.ly etc.): destino opaco, impossível de validar. |
 | `http://` | Sem exceção. Já barrado pelo `CHECK` da tabela. |
@@ -112,11 +113,22 @@ Aceitar se, e somente se, todas as condições valerem:
 |---|---|
 | `g.page` | qualquer |
 | `maps.app.goo.gl` | qualquer |
-| `maps.google.com` · `maps.google.com.br` | qualquer |
-| `goo.gl` | `/maps/` |
-| `search.google.com` | `/local/` |
-| `google.com` · `www.google.com` | `/maps` ou `/search` |
-| `google.com.br` · `www.google.com.br` | `/maps` ou `/search` |
+| `maps.google.com` · `maps.google.com.br` | `/` ou `/maps` |
+| `goo.gl` | `/maps` |
+| `search.google.com` | `/local` |
+| `google.com` | `/maps` ou `/search` |
+| `google.com.br` | `/maps` ou `/search` |
+
+O prefixo `www.` é removido na normalização, então `google.com` cobre
+`www.google.com` — por isso a lista não repete as duas formas.
+
+`maps.google.com` ficou restrito a `/` e `/maps` em vez de liberado: `/` é o
+formato por CID (`maps.google.com/?cid=…`) e a restrição garante que um
+eventual `/url` servido por esse host não vire brecha.
+
+**Comparação por segmento, não por texto.** O prefixo `/maps` autoriza `/maps`
+e `/maps/place/x`, mas **não** `/mapsqualquercoisa`. Prefixo comparado com
+`startsWith` cru seria um furo.
 
 Nenhuma outra validação de formato. **Não** vamos conferir o formato do Place
 ID, o comprimento do código do `g.page` nem a estrutura da query string —
@@ -143,6 +155,45 @@ chijn1t_tdeuemsrusoyg83fry4      ← quebrado, não existe
 ```
 
 Minúsculas **só no host**. O caminho e a query ficam intocados.
+
+---
+
+## Formatos ambíguos — decisão pendente
+
+Três casos em que a resposta certa depende de informação que ainda não temos.
+Todos estão implementados na posição mais conservadora; mudar qualquer um é
+uma linha em `GOOGLE_HOST_RULES` mais um caso de teste.
+
+### 1. `google.com/search` — aceito, mas é o mais frouxo da lista
+
+`/search?q=<nome>#lrd=…` é um deep link legítimo que abre a caixa de avaliação.
+Mas o prefixo também aceita `/search?q=qualquer+coisa`, que é só uma página de
+resultados — não um estabelecimento.
+
+Isso **não** é um risco de open redirect: o destino continua sendo uma página
+do Google. É um risco de *placa apontando para lugar inútil*.
+
+*Se você preferir apertar,* remover `/search` da lista fecha isso, ao custo de
+recusar o deep link de avaliação quando ele aparecer.
+
+### 2. `g.co` — rejeitado
+
+`g.co/kgs/<código>` é compartilhamento do painel de conhecimento e às vezes
+aponta para uma ficha de empresa. Não incluí porque o host serve muitos
+produtos e não consegui confirmar a forma exata para estabelecimentos.
+
+*Decidir quando aparecer na prática:* se um dono te der um `g.co`, me manda o
+link que eu avalio.
+
+### 3. `maps.app.goo.gl` — aceito, com risco residual
+
+É um encurtador: o destino final não é inspecionável sem seguir o
+redirecionamento. Aceito porque o host existe exclusivamente para links de
+Maps e é o que o botão Compartilhar gera hoje — recusar quebraria a maioria
+dos links que você vai receber em campo.
+
+O risco é teórico (exigiria o Google emitir um short link para fora do Maps),
+mas é o único ponto da allowlist onde não validamos o destino real.
 
 ---
 

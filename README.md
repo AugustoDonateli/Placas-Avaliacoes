@@ -44,7 +44,7 @@ uma query, uma resposta 302. Ele não importa nada do código administrativo —
 | | Etapa | Status |
 |---|---|---|
 | 1 | Infraestrutura: projeto, schema, D1 local | ✅ concluída |
-| 2 | `codes.ts` e `urls.ts` — normalização e allowlist | pendente |
+| 2 | `codes.ts` e `urls.ts` — normalização e allowlist | ✅ concluída |
 | 3 | `redirect.ts` e `pages.ts` — o caminho público | pendente |
 | 4 | Testes da máquina de estados | pendente |
 | 5 | `access.ts` e `api.ts` — leitura e escrita protegidas | pendente |
@@ -72,6 +72,8 @@ ignorado pelo git.
 ### Comandos úteis
 
 ```bash
+npm test               # roda a suite (119 testes)
+npm run test:watch     # roda em modo watch
 npm run db:list        # lista todas as placas
 npm run db:reset       # apaga o banco local e recria do zero
 npm run typecheck      # confere os tipos
