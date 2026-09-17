@@ -4,6 +4,9 @@
     "module": "es2022",
     "moduleResolution": "bundler",
     "lib": ["es2022"],
+    // Somente os tipos do runtime de Workers. O codigo em src/ nao tem acesso
+    // as APIs do Node, e nao deve ter: um `readFileSync` que passasse pelo
+    // typecheck so quebraria no deploy.
     "types": ["@cloudflare/workers-types"],
     "strict": true,
     "noUncheckedIndexedAccess": true,
@@ -12,5 +15,5 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

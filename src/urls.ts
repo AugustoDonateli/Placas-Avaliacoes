@@ -311,20 +311,20 @@ export function isValidDestination(raw: string): boolean {
 export function describeRejection(reason: UrlRejectReason): string {
   switch (reason) {
     case 'empty':
-      return 'Cole o link de avaliacao do Google.';
+      return 'Cole o link de avaliação do Google.';
     case 'too_long':
-      return 'Esse link e longo demais. Confira se colou apenas o endereco.';
+      return 'Esse link é longo demais. Confira se colou apenas o endereço.';
     case 'unparseable':
-      return 'Isso nao parece um endereco valido. Confira o que foi colado.';
+      return 'Isso não parece um endereço válido. Confira o que foi colado.';
     case 'not_https':
-      return 'Apenas enderecos https:// sao aceitos.';
+      return 'Apenas endereços https:// são aceitos.';
     case 'has_credentials':
-      return 'Esse endereco tem usuario e senha embutidos e nao e um link legitimo do Google.';
+      return 'Esse endereço tem usuário e senha embutidos e não é um link legítimo do Google.';
     case 'non_default_port':
-      return 'Esse endereco usa uma porta incomum e nao e um link legitimo do Google.';
+      return 'Esse endereço usa uma porta incomum e não é um link legítimo do Google.';
     case 'host_not_allowed':
-      return 'So aceitamos links do Google (Maps, Perfil da Empresa ou formulario de avaliacao).';
+      return 'Só aceitamos links do Google (Maps, Perfil da Empresa ou formulário de avaliação).';
     case 'path_not_allowed':
-      return 'Esse e um endereco do Google, mas nao aponta para um estabelecimento. Use o link de avaliacao ou a ficha no Maps.';
+      return 'Esse é um endereço do Google, mas não aponta para um estabelecimento. Use o link de avaliação ou a ficha no Maps.';
   }
 }

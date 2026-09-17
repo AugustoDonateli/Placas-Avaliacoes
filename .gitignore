@@ -2,6 +2,10 @@ node_modules/
 .wrangler/
 .dev.vars
 .dev.vars.*
+# O exemplo e commitado de proposito: nao tem segredo, so o formato.
+!.dev.vars.example
+.env
+.env.*
 dist/
 .DS_Store
 *.log

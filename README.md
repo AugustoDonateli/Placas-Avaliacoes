@@ -47,7 +47,7 @@ uma query, uma resposta 302. Ele não importa nada do código administrativo —
 | 2 | `codes.ts` e `urls.ts` — normalização e allowlist | ✅ concluída |
 | 3 | `redirect.ts` e `pages.ts` — o caminho público | ✅ concluída |
 | 4 | Testes da máquina de estados | ✅ concluída |
-| 5 | `access.ts` e `api.ts` — leitura e escrita protegidas | pendente |
+| 5 | `access.ts` e `api.ts` — leitura e escrita protegidas | ✅ concluída |
 | 6 | Deploy, domínio e Cloudflare Access | pendente |
 | — | Painel e landing page | fora de escopo por enquanto |
 
@@ -72,7 +72,7 @@ ignorado pelo git.
 ### Comandos úteis
 
 ```bash
-npm test               # roda a suite (163 testes)
+npm test               # roda a suite (265 testes)
 npm run test:watch     # roda em modo watch
 npm run db:list        # lista todas as placas
 npm run db:reset       # apaga o banco local e recria do zero
@@ -115,12 +115,71 @@ npx wrangler d1 execute placas-avaliacoes --local --command \
 curl -i http://localhost:8787/001     # mesmo endereço, destino novo
 ```
 
-### Variáveis de ambiente opcionais
+### Variáveis de ambiente
 
 | | |
 |---|---|
-| `WHATSAPP_NUMBER` | número internacional só com dígitos. Liga o botão de contato nas páginas de estado. Sem ele, o botão não aparece. |
+| `ACCESS_TEAM_DOMAIN` | `suaequipe.cloudflareaccess.com` |
+| `ACCESS_AUD` | a tag *Application Audience* da aplicação no Access |
+| `ADMIN_EMAILS` | opcional: lista separada por vírgula. Camada extra sobre a política do Access. |
+| `WHATSAPP_NUMBER` | número internacional só com dígitos. Liga o botão de contato nas páginas de estado. |
 | `BRAND_NAME` | assinatura no rodapé das páginas. |
+
+**Sem `ACCESS_TEAM_DOMAIN` e `ACCESS_AUD`, a API recusa tudo com 503.** Ela
+nunca abre sozinha por falta de configuração — o dia do erro de configuração é
+exatamente o dia em que a proteção precisa funcionar.
+
+Para desenvolver local, copie `.dev.vars.example` para `.dev.vars`. O
+`wrangler deploy` nunca envia esse arquivo, e o atalho que ele liga é ignorado
+sempre que o Access está configurado.
+
+---
+
+## A API administrativa
+
+Toda rota abaixo fica atrás do Cloudflare Access **e** da verificação de JWT
+dentro do Worker.
+
+| | |
+|---|---|
+| `GET /api/plates` | lista. Aceita `?status=` e `?limit=` |
+| `GET /api/plates/:code` | uma placa |
+| `POST /api/plates` | cria em lote: `{"from":"001","to":"020"}` ou `{"codes":[…]}` |
+| `PATCH /api/plates/:code` | altera destino, estabelecimento, status e observações |
+
+Criar uma faixa que encosta em placas existentes devolve **409 com a lista de
+conflitos e não cria nada**. Envie `"skip_existing": true` para criar apenas as
+que faltam.
+
+`PATCH` recusa `code` no corpo com 400: o código está impresso no QR e gravado
+na tag NFC. Também recusa ativar uma placa sem destino, e exige
+`"confirm_reactivate": true` para tirar uma placa de `retired`.
+
+### Testando a API localmente
+
+```bash
+cp .dev.vars.example .dev.vars
+npm run db:reset
+npm run dev
+```
+
+```bash
+API=http://localhost:8787/api/plates
+
+curl -X POST $API -H 'content-type: application/json' -d '{"from":"001","to":"020"}'
+curl $API/004
+curl -X PATCH $API/004 -H 'content-type: application/json' -d '{
+  "establishment": "Barbearia do João",
+  "destination_url": "https://g.page/r/CfMgH0abcDEF/review",
+  "status": "active"
+}'
+curl -i http://localhost:8787/004     # já redireciona
+```
+
+Para testes de ponta a ponta com script, use `npm run dev:e2e` e
+`npm run dev:stop`: matar o processo do wrangler **não** derruba o `workerd`
+filho, que continua segurando a porta e servindo código antigo — e um teste
+que fala com esse órfão devolve resultado falso com cara de verdadeiro.
 
 ---
 

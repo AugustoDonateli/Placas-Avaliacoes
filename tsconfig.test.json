@@ -1,0 +1,14 @@
+{
+  // Os testes rodam no Node, entao aqui os tipos do Node existem — incluindo
+  // node:sqlite, usado pelo D1 de teste em test/helpers/d1.ts.
+  //
+  // E um arquivo separado de proposito: assim src/ continua sem acesso as
+  // APIs do Node, e nao da para escrever no Worker algo que so funciona local.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["@cloudflare/workers-types", "node"],
+    "module": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}

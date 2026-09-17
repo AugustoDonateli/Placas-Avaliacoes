@@ -1,0 +1,13 @@
+# Copie para `.dev.vars` (que esta no .gitignore) para desenvolver local.
+#
+# O `wrangler deploy` NUNCA envia .dev.vars. E essa propriedade do Wrangler,
+# e nao a nossa disciplina, que impede o atalho abaixo de chegar em producao.
+#
+# Alem disso, o atalho so vale quando ACCESS_AUD nao esta configurado: em
+# producao, que tem Access, ele e ignorado.
+DEV_INSECURE_API="true"
+
+# Em producao, estes valores vao em [vars] no wrangler.toml (ou como secret):
+# ACCESS_TEAM_DOMAIN="suaequipe.cloudflareaccess.com"
+# ACCESS_AUD="a-tag-Application-Audience-da-aplicacao-no-Access"
+# ADMIN_EMAILS="voce@exemplo.com"
