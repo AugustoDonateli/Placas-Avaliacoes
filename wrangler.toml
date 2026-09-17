@@ -11,22 +11,44 @@ compatibility_date = "2026-09-01"
 # o destino das placas dos clientes.
 #
 # O Access so protege o dominio proprio. Mantenha isto em false.
+# `npm run preflight` falha se alguem mexer aqui.
 # =============================================================================
 workers_dev = false
 
-# O dominio real entra aqui quando estiver registrado. Ate la, tudo roda em
-# localhost via `npm run dev`.
+# -----------------------------------------------------------------------------
+# DOMINIO — descomente quando o dominio estiver registrado e o DNS na Cloudflare
+# -----------------------------------------------------------------------------
+# Troque SEUDOMINIO.com.br nas duas linhas. O padrao `/*` cobre tanto os codigos
+# das placas quanto /api, e o Access se encarrega de proteger /api.
+#
 # routes = [
-#   { pattern = "SEUDOMINIO.com/*", zone_name = "SEUDOMINIO.com" }
+#   { pattern = "SEUDOMINIO.com.br/*", zone_name = "SEUDOMINIO.com.br" }
 # ]
 
 [[d1_databases]]
 binding = "DB"
 database_name = "placas-avaliacoes"
-# Placeholder. O valor real sai de `npx wrangler d1 create placas-avaliacoes`
-# e so e necessario para o banco remoto — o banco local ignora este campo.
+# Placeholder. O valor real sai de `npx wrangler d1 create placas-avaliacoes`.
+# O banco LOCAL ignora este campo; so o remoto precisa dele.
 database_id = "00000000-0000-0000-0000-000000000000"
 migrations_dir = "migrations"
 
 [observability]
 enabled = true
+
+# -----------------------------------------------------------------------------
+# VARIAVEIS — preencha antes do primeiro deploy
+# -----------------------------------------------------------------------------
+# Nenhuma delas e segredo: sao identificadores publicos. A seguranca vem da
+# assinatura do JWT, nao de esconder estes valores.
+#
+# Sem ACCESS_TEAM_DOMAIN e ACCESS_AUD a API recusa TUDO com 503 — ela nunca
+# abre sozinha por falta de configuracao. `npm run preflight` avisa se
+# estiverem vazias.
+#
+# [vars]
+# ACCESS_TEAM_DOMAIN = "suaequipe.cloudflareaccess.com"
+# ACCESS_AUD = "cole-aqui-a-tag-Application-Audience-da-aplicacao"
+# ADMIN_EMAILS = "augustodonatelisimoes@gmail.com"
+# WHATSAPP_NUMBER = "5519999999999"
+# BRAND_NAME = "Placas de Avaliação"

@@ -15,7 +15,10 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev:e2e": "scripts/dev-server.sh start",
-    "dev:stop": "scripts/dev-server.sh stop"
+    "dev:stop": "scripts/dev-server.sh stop",
+    "preflight": "scripts/preflight.sh",
+    "smoke": "scripts/smoke.sh",
+    "deploy": "npm run preflight && wrangler deploy"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260916.1",

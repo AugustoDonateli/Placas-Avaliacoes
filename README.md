@@ -48,7 +48,7 @@ uma query, uma resposta 302. Ele não importa nada do código administrativo —
 | 3 | `redirect.ts` e `pages.ts` — o caminho público | ✅ concluída |
 | 4 | Testes da máquina de estados | ✅ concluída |
 | 5 | `access.ts` e `api.ts` — leitura e escrita protegidas | ✅ concluída |
-| 6 | Deploy, domínio e Cloudflare Access | pendente |
+| 6 | Deploy, domínio e Cloudflare Access | preparada — [runbook](docs/deploy.md), aguarda o domínio |
 | — | Painel e landing page | fora de escopo por enquanto |
 
 As etapas 1 a 5 rodam **inteiramente local**. O domínio só é necessário na 6.
@@ -235,13 +235,25 @@ pelo próprio Google.
 
 ---
 
-## Deploy (etapa 6, ainda não executada)
+## Deploy
+
+Roteiro completo em **[`docs/deploy.md`](docs/deploy.md)**. Bloqueado até o
+domínio estar registrado e com DNS na Cloudflare.
 
 ```bash
-npx wrangler d1 create placas-avaliacoes     # copiar o database_id para wrangler.toml
-npx wrangler d1 migrations apply placas-avaliacoes --remote
-npx wrangler deploy
+npm run preflight                  # confere antes de publicar
+npm run deploy                     # preflight + wrangler deploy
+npm run smoke SEUDOMINIO.com.br    # confere o que está no ar
 ```
 
-Depois, no painel da Cloudflare: apontar a rota do domínio e criar a aplicação
-do Access cobrindo `/admin*` e `/api*`, liberando apenas o seu e-mail.
+`preflight` reprova se `workers_dev` não estiver `false`, se as variáveis do
+Access estiverem vazias, se a rota ainda tiver `SEUDOMINIO`, se o `database_id`
+for o placeholder, ou se testes/typecheck falharem.
+
+`smoke` confere as quatro coisas que, erradas, quebram o produto sem dar sinal:
+o redirecionamento ser **302 e não 301**, a resposta não ser cacheável, a API
+exigir autenticação de verdade, e não existir cópia do Worker em
+`*.workers.dev`.
+
+**Nunca imprima QR antes do `smoke` passar.** O QR é a única parte irreversível
+do sistema.
