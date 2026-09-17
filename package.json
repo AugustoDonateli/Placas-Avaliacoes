@@ -1,0 +1,21 @@
+{
+  "name": "placas-avaliacoes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Redirecionador permanente para as placas de avaliacao (QR + NFC).",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "wrangler d1 migrations apply placas-avaliacoes --local",
+    "db:migrate:remote": "wrangler d1 migrations apply placas-avaliacoes --remote",
+    "db:seed": "wrangler d1 execute placas-avaliacoes --local --file=seeds/dev-seed.sql",
+    "db:reset": "rm -rf .wrangler/state/v3/d1 && npm run db:migrate",
+    "db:list": "wrangler d1 execute placas-avaliacoes --local --command \"SELECT code, status, establishment, destination_url FROM plates ORDER BY code;\""
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260916.1",
+    "typescript": "^5.7.2",
+    "wrangler": "^4.133.0"
+  }
+}

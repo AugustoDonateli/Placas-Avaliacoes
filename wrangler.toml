@@ -1,0 +1,32 @@
+name = "placas-avaliacoes"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# =============================================================================
+# SEGURANCA — NAO REMOVER
+# =============================================================================
+# Com workers_dev = true, este Worker tambem responderia em
+# placas-avaliacoes.<sua-conta>.workers.dev — um endereco que NAO passa pelo
+# Cloudflare Access. Isso seria uma porta dos fundos direto na API que altera
+# o destino das placas dos clientes.
+#
+# O Access so protege o dominio proprio. Mantenha isto em false.
+# =============================================================================
+workers_dev = false
+
+# O dominio real entra aqui quando estiver registrado. Ate la, tudo roda em
+# localhost via `npm run dev`.
+# routes = [
+#   { pattern = "SEUDOMINIO.com/*", zone_name = "SEUDOMINIO.com" }
+# ]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "placas-avaliacoes"
+# Placeholder. O valor real sai de `npx wrangler d1 create placas-avaliacoes`
+# e so e necessario para o banco remoto — o banco local ignora este campo.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[observability]
+enabled = true
