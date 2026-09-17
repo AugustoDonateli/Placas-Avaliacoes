@@ -45,8 +45,8 @@ uma query, uma resposta 302. Ele não importa nada do código administrativo —
 |---|---|---|
 | 1 | Infraestrutura: projeto, schema, D1 local | ✅ concluída |
 | 2 | `codes.ts` e `urls.ts` — normalização e allowlist | ✅ concluída |
-| 3 | `redirect.ts` e `pages.ts` — o caminho público | pendente |
-| 4 | Testes da máquina de estados | pendente |
+| 3 | `redirect.ts` e `pages.ts` — o caminho público | ✅ concluída |
+| 4 | Testes da máquina de estados | ✅ concluída |
 | 5 | `access.ts` e `api.ts` — leitura e escrita protegidas | pendente |
 | 6 | Deploy, domínio e Cloudflare Access | pendente |
 | — | Painel e landing page | fora de escopo por enquanto |
@@ -72,7 +72,7 @@ ignorado pelo git.
 ### Comandos úteis
 
 ```bash
-npm test               # roda a suite (119 testes)
+npm test               # roda a suite (163 testes)
 npm run test:watch     # roda em modo watch
 npm run db:list        # lista todas as placas
 npm run db:reset       # apaga o banco local e recria do zero
@@ -81,6 +81,46 @@ npm run typecheck      # confere os tipos
 # Qualquer SQL:
 npx wrangler d1 execute placas-avaliacoes --local --command "SELECT * FROM plates;"
 ```
+
+### Roteiro de teste manual
+
+Com `npm run db:seed` aplicado e `npm run dev` rodando:
+
+| Endereço | Placa | Esperado |
+|---|---|---|
+| `/001` | ativa | **302** + `Location` para o Google |
+| `/002` | em estoque | 200 · "ainda não configurada" |
+| `/003` | pausada | 200 · "temporariamente indisponível" |
+| `/004` | aposentada | 200 · "plaquinha desativada" |
+| `/005` | destino inválido | 200 · "erro de configuração" |
+| `/006` | ativa, Place ID | **302**, com o Place ID intacto |
+| `/999` | não existe | **404** · "código não encontrado" |
+
+Para ver os cabeçalhos, que é onde estão as garantias:
+
+```bash
+curl -i http://localhost:8787/001
+```
+
+Confira que a resposta é `302` (nunca `301`) e traz `Cache-Control: no-store`.
+As páginas de estado trazem `x-plate-state`, para você filtrar nos logs.
+
+**A demonstração que vale a pena fazer** — trocar o cliente de uma placa sem
+tocar no QR:
+
+```bash
+npx wrangler d1 execute placas-avaliacoes --local --command \
+  "UPDATE plates SET destination_url='https://g.page/r/Restaurante/review' WHERE code='001';"
+
+curl -i http://localhost:8787/001     # mesmo endereço, destino novo
+```
+
+### Variáveis de ambiente opcionais
+
+| | |
+|---|---|
+| `WHATSAPP_NUMBER` | número internacional só com dígitos. Liga o botão de contato nas páginas de estado. Sem ele, o botão não aparece. |
+| `BRAND_NAME` | assinatura no rodapé das páginas. |
 
 ---
 
